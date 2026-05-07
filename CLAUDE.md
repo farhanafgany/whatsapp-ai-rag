@@ -28,7 +28,7 @@ Bot menerima pesan WhatsApp via Twilio, mencari informasi relevan dari ChromaDB 
 │   └── services/
 │       ├── admin.py       # FastAPI router /admin — dashboard HTML, HTTP Basic Auth
 │       ├── chat.py        # generate_response() — inti: RAG + history + OpenAI + handoff
-│       ├── database.py    # SQLite: init_db(), get/save/delete history, get_all_users()
+│       ├── database.py    # SQLite: init_db(), get/save/delete history, get_all_users(), get_stats()
 │       ├── rag.py         # ChromaDB: load dokumen, embed, retrieve()
 │       └── webhook.py     # FastAPI app, endpoint POST /webhook, lifespan startup
 ├── data/
@@ -120,8 +120,13 @@ ngrok http 8000
 
 - URL: `http://localhost:8000/admin/` (lokal) atau `https://nama-app.up.railway.app/admin/`
 - Auth: HTTP Basic — username bebas, password dari env var `ADMIN_PASSWORD` (default: `admin123`)
-- Fitur: lihat semua user, baca history percakapan per user, hapus history
+- Fitur:
+  - 3 stat cards: total pengguna, total pesan, pesan hari ini (`get_stats()`)
+  - Bar chart aktivitas pesan 14 hari terakhir (Chart.js via CDN, tidak perlu install)
+  - Tabel semua user dengan tombol Lihat History & Hapus
+  - Halaman history per user dengan chat bubble + timestamp
 - Implementasi: pure FastAPI + inline HTML/CSS, tanpa Streamlit atau framework frontend
+- Chart.js dimuat dari CDN `cdn.jsdelivr.net` — butuh koneksi internet saat buka dashboard
 
 ## Handoff ke Human Agent
 

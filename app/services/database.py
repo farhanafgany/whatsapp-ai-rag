@@ -73,3 +73,27 @@ def delete_history(phone_number: str):
     conn.execute("DELETE FROM conversations WHERE phone_number = ?", (phone_number,))
     conn.commit()
     conn.close()
+
+
+def get_stats() -> dict:
+    conn = sqlite3.connect(DB_PATH)
+    total_messages = conn.execute("SELECT COUNT(*) FROM conversations").fetchone()[0]
+    total_users = conn.execute("SELECT COUNT(DISTINCT phone_number) FROM conversations").fetchone()[0]
+    today_messages = conn.execute(
+        "SELECT COUNT(*) FROM conversations WHERE DATE(timestamp) = DATE('now', 'localtime')"
+    ).fetchone()[0]
+    chart_data = conn.execute(
+        """SELECT DATE(timestamp) as day, COUNT(*) as cnt
+           FROM conversations
+           GROUP BY day
+           ORDER BY day DESC
+           LIMIT 14"""
+    ).fetchall()
+    conn.close()
+    return {
+        "total_users": total_users,
+        "total_messages": total_messages,
+        "today_messages": today_messages,
+        "chart_labels": [r[0] for r in reversed(chart_data)],
+        "chart_values": [r[1] for r in reversed(chart_data)],
+    }
