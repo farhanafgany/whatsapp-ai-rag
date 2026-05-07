@@ -40,3 +40,36 @@ def save_message(phone_number: str, role: str, content: str):
     )
     conn.commit()
     conn.close()
+
+
+def get_all_users() -> list[dict]:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.execute(
+        """SELECT phone_number, COUNT(*) as msg_count, MAX(timestamp) as last_active
+           FROM conversations
+           GROUP BY phone_number
+           ORDER BY last_active DESC"""
+    )
+    rows = cursor.fetchall()
+    conn.close()
+    return [{"phone_number": r[0], "msg_count": r[1], "last_active": r[2]} for r in rows]
+
+
+def get_full_history(phone_number: str, limit: int = 200) -> list[dict]:
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.execute(
+        """SELECT role, content, timestamp FROM conversations
+           WHERE phone_number = ?
+           ORDER BY timestamp ASC LIMIT ?""",
+        (phone_number, limit),
+    )
+    rows = cursor.fetchall()
+    conn.close()
+    return [{"role": r[0], "content": r[1], "timestamp": r[2]} for r in rows]
+
+
+def delete_history(phone_number: str):
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("DELETE FROM conversations WHERE phone_number = ?", (phone_number,))
+    conn.commit()
+    conn.close()

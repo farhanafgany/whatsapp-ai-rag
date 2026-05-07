@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Form, Response
 from twilio.twiml.messaging_response import MessagingResponse
 
+from app.services.admin import router as admin_router
 from app.services.chat import generate_response
 from app.services.database import init_db
 from app.services.rag import get_vectorstore
@@ -16,6 +17,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(admin_router)
 
 
 @app.post("/webhook")
