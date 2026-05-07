@@ -1,0 +1,20 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Environment variables
+.env
+
+# Database & vector store (generated at runtime)
+nexora.db
+chroma_db/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
